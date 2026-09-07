@@ -30,7 +30,6 @@ main:
 	
 		lw a1, 0(gp)  #gado el número a convertir en un registro
 	    bge a1, zero, set # Si el número es mayor o igual a cero continuo con el proceso
-	    sub  a1, zero, s1 # Cambio el signo
 	    addi t3, t3, 7 # Constante para iterar la cantidad de sumas de desplazamiento 
 	
 	    set:
