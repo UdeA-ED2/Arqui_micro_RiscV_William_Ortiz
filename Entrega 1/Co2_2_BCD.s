@@ -30,12 +30,11 @@ main:
 	
 		lw a1, 0(gp)  #gado el número a convertir en un registro
 	    bge a1, zero, set # Si el número es mayor o igual a cero continuo con el proceso
-	    addi t3, t3, 7 # Constante para iterar la cantidad de sumas de desplazamiento 
-	
+
 	    set:
 			addi s2, zero, 0
 			addi s3, gp, 8 #potencia de 10 mas grande
-			addi s4, zero, 8 #contador de las potencias
+			addi s4, zero, 9 #contador de las potencias
 	
 	    set_loop:
 			beq  s4, zero, fin
@@ -54,8 +53,7 @@ main:
 		veri:
 			add t2, t2, t1 # guardo el numero de veces que está la potencia de 10 en otro registro para organizar el número 
 			addi t4, t4, 28 # Contador de las sumas de desplazamiento 
-			beq s4, t3, sumad # If para decidir la cantidad de sumas 
-		
+	
 			suma28:
 				beq t4, zero, set_loop
 				add t2, t2, t2
