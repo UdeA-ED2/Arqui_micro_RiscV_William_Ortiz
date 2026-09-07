@@ -2,18 +2,19 @@
 
 .data
 
-ejemplo: .word 1234
-bcd: .word 0
+ejemplo: .word 1234 #0
+bcd: .word 0 #4
+
 po10:
-	.word 100000000
-	.word 10000000
-	.word 1000000
-	.word 100000
-	.word 10000
-	.word 1000
-	.word 100
-	.word 10
-	.word 1
+	.word 100000000 #8
+	.word 10000000  #12
+	.word 1000000   #16
+	.word 100000    #20
+	.word 10000     #24
+	.word 1000      #28  
+	.word 100       #32
+	.word 10        #36
+	.word 1         #40
 	
 _start:
 	
@@ -23,12 +24,11 @@ _start:
 	
 	set:
 		addi s2, zero, 0
-		addi s3, gp, 12 #potencia de 10 mas grande
+		addi s3, gp, 8 #potencia de 10 mas grande
 		addi s4, zero, 8 #contador de las potencias
 	
 	set_loop:
 		beq  s4, zero, fin
-		
 		lw t0, 0(s4)
 		addi s3, s3, 4 #variable para cambiar de dirección de memoria
 		addi s4, s4, -1 #contador de las potencias
