@@ -26,13 +26,17 @@ bcd_out:
 
 .text
 _start:
-main:
+
+  main:
     # Preparación de punteros asumiendo que 'gp' apunta al inicio de .data
     # (Desplazamientos exactos basados en el tamaño de los datos declarados arriba)
 	
+	addi sp, zero, 1024
+	addi gp, zero, 216
+	
     addi s0, zero, 0     # s0 = Índice del bucle de pruebas (i = 0)
     addi s1, zero, 3     # s1 = Cantidad de pruebas a realizar
-    add s2, gp, zero     # s2 = Puntero de lectura (lista)
+    add s2, gp, zero   # s2 = Puntero de lectura (lista)
     addi s3, gp, 12      # s3 = Puntero a las potencias (12 bytes después del inicio)
     addi s4, gp, 52      # s4 = Puntero de escritura (52 bytes después: 12 de lista + 40 de po10)
 
@@ -40,7 +44,7 @@ test_loop:
     beq s0, s1, end_main # Si i == 3, terminar programa
 
     # Cargar argumentos para la función
-    lw a0, 0(s2)         # a0 = Número actual de la lista
+    lw a0, 0(s2)        # a0 = Número actual de la lista
     add a1, s3, zero     # a1 = Puntero a po10
     add a2, s4, zero     # a2 = Puntero a bcd_out
 
@@ -62,7 +66,7 @@ end_main:
 
 ca2BCD:
     
-    addi sp, sp, -20
+    addi sp, sp, -20 #Creo espacio para guardar cinco registros
     sw ra, 16(sp)
     sw s2, 12(sp)
     sw s3, 8(sp)
@@ -71,12 +75,27 @@ ca2BCD:
 
     
     add t6, a0, zero     # Trabajar con copia (t6)
-    bge t6, zero, set    # Si es >= 0, iniciar
-    sub t6, zero, t6     # Si es < 0, aplicar Ca2 (invertir signo)
+	add s5, a2, zero     # s5 = puntero de escritura de BCD
+	
+    bge t6, zero, es_positivo
+	
+	# Caso Negativo: Guardar 1 y convertir t6 a positivo
+    addi t1, zero, 1     
+    sw t1, 0(s5)         # Guardar 1 en el primer word
+    addi s5, s5, 4       # Avanzar puntero para los dígitos
+    sub t6, zero, t6     # Invertir signo (hacerlo positivo)
+    jal zero, set
+	
+	es_positivo:
+    # Caso Positivo: Guardar 0
+    addi t1, zero, 0     
+    sw t1, 0(s5)         # Guardar 0 en el primer word
+    addi s5, s5, 4       # Avanzar puntero para los dígitos
+	
+	
 
 set:
     add s3, a1, zero     # s3 = puntero de lectura de potencias
-    add s5, a2, zero     # s5 = puntero de escritura de BCD
     addi s4, zero, 10    # s4 = 10 iteraciones (10^9 hasta 10^0)
 
 set_loop:
