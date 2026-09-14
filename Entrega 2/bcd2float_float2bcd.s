@@ -12,8 +12,10 @@ pruebas:
 	
 .text
 _start:
-
-	set:	
+	add t3, zero, zero
+	add t1, zero, zero
+	set:
+		add t3, t1, t3	
 		addi s0, zero, 42
 		la gp, pruebas
 		beq t0, s0, fin
@@ -29,7 +31,8 @@ _start:
 		beq t2, zero, set
 		addi t2, t2, -1
 		addi t1, t1, 10
-		addi t3, t3, t1
 		j sucev_sum
-	   
+		
+	fin:
+	
 	
