@@ -3,11 +3,11 @@
 .data
 # 1. Lista de números a probar
 lista: 
-    .word 12000000       # Prueba 1: Positivo normal
-    .word -98765         # Prueba 2: Número negativo (Complemento a 2)
-    .word 0              # Prueba 3: Cero absoluto
+    .word -123456      # Prueba 1
+    .word -98765         # Prueba 2 
+    .word 0              # Prueba 3 
 
-# 2. Arreglo de potencias de 10 (10^9 hasta 10^0)
+# 2. Arreglo de potencias de 10 
 po10:
     .word 1000000000
     .word 100000000
@@ -20,44 +20,44 @@ po10:
     .word 10
     .word 1
 
-# 3. Espacio en memoria para la salida BCD (40 bytes = 10 dígitos x 4 bytes)
+# 3. Espacio en memoria para la salida BCD (40 bytes = 10 dígitos x 4 bytes + el signo)
 bcd_out: 
-    .zero 40
+    .zero 44
 
 .text
 _start:
 
   main:
-    # Preparación de punteros asumiendo que 'gp' apunta al inicio de .data
-    # (Desplazamientos exactos basados en el tamaño de los datos declarados arriba)
+    
+    
 	
-	addi sp, zero, 1024
-	addi gp, zero, 216
+	addi sp, zero, 1024 #pongo el puntero de stack lejos de los valores guardados
+	addi gp, zero, 216 # posición de "lista" en la memoria 
 	
-    addi s0, zero, 0     # s0 = Índice del bucle de pruebas (i = 0)
-    addi s1, zero, 3     # s1 = Cantidad de pruebas a realizar
-    add s2, gp, zero   # s2 = Puntero de lectura (lista)
-    addi s3, gp, 12      # s3 = Puntero a las potencias (12 bytes después del inicio)
-    addi s4, gp, 52      # s4 = Puntero de escritura (52 bytes después: 12 de lista + 40 de po10)
+    addi s0, zero, 0     # Índice del bucle de pruebas (i = 0)
+    addi s1, zero, 3     # Cantidad de pruebas a realizar
+    add s2, gp, zero     # Puntero a lista
+    addi s3, gp, 12      # Puntero a las potencias
+    addi s4, gp, 52      # Puntero de escritura 
 
 test_loop:
-    beq s0, s1, end_main # Si i == 3, terminar programa
+    beq s0, s1, end_main # Si s0 == s3, terminar programa
 
     # Cargar argumentos para la función
-    lw a0, 0(s2)        # a0 = Número actual de la lista
-    add a1, s3, zero     # a1 = Puntero a po10
-    add a2, s4, zero     # a2 = Puntero a bcd_out
+    lw a0, 0(s2)         # Número actual de la lista
+    add a1, s3, zero     # Puntero a potencias
+    add a2, s4, zero     # Puntero a bcd_out
 
     # Llamar a la función
     jal ra, ca2BCD
 
     # Avanzar punteros e índice para la siguiente prueba
     addi s2, s2, 4       # Siguiente número en la lista
-    addi s0, s0, 1       # i++
+    addi s0, s0, 1       # s0++
     jal zero, test_loop  # Repetir
 
 end_main:
-    jal zero, end_main   # Bucle infinito para finalizar ejecución con seguridad
+    jal zero, end_main   # Bucle infinito para finalizar programa
 
 
 
@@ -83,7 +83,7 @@ ca2BCD:
     addi t1, zero, 1     
     sw t1, 0(s5)         # Guardar 1 en el primer word
     addi s5, s5, 4       # Avanzar puntero para los dígitos
-    sub t6, zero, t6     # Invertir signo (hacerlo positivo)
+    sub t6, zero, t6     # Invertir signo 
     jal zero, set
 	
 	es_positivo:
@@ -96,7 +96,7 @@ ca2BCD:
 
 set:
     add s3, a1, zero     # s3 = puntero de lectura de potencias
-    addi s4, zero, 10    # s4 = 10 iteraciones (10^9 hasta 10^0)
+    addi s4, zero, 10    # s4 = 10 iteraciones 
 
 set_loop:
     beq s4, zero, fin
@@ -127,7 +127,6 @@ fin:
     addi sp, sp, 20
 
     jr ra # Retorno 
-			
 			
 		 	
 	
