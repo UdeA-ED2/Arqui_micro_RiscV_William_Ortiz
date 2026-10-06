@@ -7,11 +7,14 @@
     test_float: .word 0xC2F69999   # -29.6875 en IEEE 754
     bcd_out:    .space 64          # Espacio para el resultado BCD
     bcd_in:     .word '-', '1', '2', '3', '.', '4', '5', '@' # Arreglo BCD de entrada con signo
-
+    stack_space: .space 256
+    stack_top:
+	
 .text
 .globl main
 
 main:
+	la sp, stack_top
     # 1. Probar Float a BCD 
     la t0, test_float #Cargo dirección
     lw t0, 0(t0)      #Cargo la dirección del numero en float 
@@ -74,15 +77,17 @@ loop_int_extract:
 
     fcvt.s.w f5, t4      # Tomo la parte entera del cociente
     fmul.s f5, f5, f1    # La multiplico por 10
-    fcvt.w.s t5, f5, rtz      # Paso el resultado a int
+    fcvt.w.s t5, f5, rtz # Paso el resultado a int
     sub t6, t3, t5       # Le resto al numero completo el procesado para obtener el ultimo digito
 
     # Guardo dígito en la pila para invertir el orden
 	
-    addi sp, sp, -4      # Me muevo una posición en la pila
+	addi sp, sp, -4      # Me muevo una posición en la pila
     sw t6, 0(sp)         # Guardo el digito en esa posición
     addi t2, t2, 1       # contador++
     add t3, zero, t4     # Nuevo dividendo = cociente
+	
+
 	
     jal zero, loop_int_extract
 
@@ -96,18 +101,15 @@ check_zero_int:
 
 write_int_dig:
 
-    add s1, zero, sp
-	slli t0, t2, 2
     # Escribo los dígitos enteros en orden correcto a la memoria BCD convertidos a ASCII ('0' + dígito)
-    
-    lw t6, 0(s1)         # Guardo el primer digito en un temp
-    addi s1, s1, 4       # Avanzo en una posiciónes del stack
+    lw t6, 0(sp)         # Guardo el primer digito en un temp
+    addi sp, sp, 4       # Avanzo en una posiciónes del stack
     addi t6, t6, '0'     # Convierto el valor numérico a carácter ASCII 
     sb t6, 0(a0)         # sb en lugar de sw para guardar un byte por carácter
     addi a0, a0, 1       # Avanzo una posición en memoria
     addi t2, t2, -1      # Le resto al contador 1
     bne t2, zero, write_int_dig
-    add sp, sp, t0
+    
 	
     #Procesar Parte Decimal
 	
@@ -222,9 +224,5 @@ end_b2f:
     fmul.s fa0, fa0, f2  # fa0 = -fa0
 
 finish_b2f:
-    jalr zero, ra, 0
-	
-
-end_b2f:
     jalr zero, ra, 0
 	
