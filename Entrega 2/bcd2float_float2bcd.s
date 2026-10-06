@@ -6,7 +6,7 @@
     # Caso de prueba: Float -123.45 (probando signo negativo)
     test_float: .word 0xC2F69999   # -29.6875 en IEEE 754
     bcd_out:    .space 64          # Espacio para el resultado BCD
-    bcd_in:     .word '-', '1', '2', '3', '.', '4', '5', '@' # Arreglo BCD de entrada con signo
+    bcd_in:     .byte '-', '1', '2', '3', '.', '4', '5', '@' # Arreglo BCD de entrada con signo
     stack_space: .space 256
     stack_top:
 	
@@ -163,7 +163,7 @@ bcd_a_float:
     la t0, float_0
     lw t0, 0(t0)
     fmv.w.x fa0, t0      # fa0 = 0.0 (Acumulador)
-    fmv.s f10, f1
+    fmv.s f6, f1
     addi t3, zero, '@'   # Centinela
     addi t4, zero, '.'   # Punto decimal
     addi t6, zero, '-'   # Signo negativo
@@ -203,9 +203,9 @@ set_negative_sign:
 
 process_decimal_digit_b2f:
     # Modo Decimal: fa0 = fa0 + (dígito / divisor)
-    fdiv.s f3, f2, f10   # f3 = dígito / divisor
+    fdiv.s f3, f2, f6   # f3 = dígito / divisor
     fadd.s fa0, fa0, f3
-    fmul.s f10, f10, f1  # Incrementar divisor (* 10.0)
+    fmul.s f6, f6, f1  # Incrementar divisor (* 10.0)
 
 next_bcd_char_b2f:
     addi a0, a0, 1       # Incrementar de a 1 byte (ya que usamos sb/lbu)
@@ -224,5 +224,4 @@ end_b2f:
     fmul.s fa0, fa0, f2  # fa0 = -fa0
 
 finish_b2f:
-    jalr zero, ra, 0
-	
+    jalr zero, ra, 0	
